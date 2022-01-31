@@ -83,8 +83,8 @@ class _HomePageState extends State<HomePage> {
               InkWell(
                 onTap: () {
                   //pesquisa();
-                  pesquisa_local();
-                  // Navigator.pushNamed(context, "/cardapio");
+                  //pesquisa_local();
+                  Navigator.pushNamed(context, "/cardapio");
                 },
                 child: Container(
                   height: 150,
