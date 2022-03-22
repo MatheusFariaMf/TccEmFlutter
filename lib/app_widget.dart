@@ -8,6 +8,7 @@ import 'package:uai_pay/modules/pedidos_abertos/pedidos_abertos.dart';
 import 'package:uai_pay/shared/themes/app_colors.dart';
 
 import 'modules/home/home_page.dart';
+import 'modules/leitor_qr_code/leitor_qr_code.dart';
 import 'modules/splash/splash_page.dart';
 
 class AppWidget extends StatelessWidget {
@@ -36,6 +37,7 @@ class AppWidget extends StatelessWidget {
           "/cardapio": (context) => MainCardapioPage(),
           "/formas_pagamento": (context) => FormasPagamento(),
           "/pedidos_abertos": (context) => PedidosAbertos(),
+          "/leitura_qrcode": (context) => LeitorQrCode(),
         });
   }
 }

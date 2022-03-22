@@ -41,6 +41,14 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
+    final larguraTela = MediaQuery.of(context).size.width - 32;
+
+    final ButtonStyle style = ElevatedButton.styleFrom(
+      textStyle: const TextStyle(fontSize: 20),
+      fixedSize: Size(larguraTela, 45),
+      primary: AppColors.secundary,
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text("AppBar da página Home"),
@@ -55,7 +63,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               InkWell(
                 onTap: () {
-                  Navigator.pushNamed(context, "/cardapio");
+                  Navigator.pushNamed(context, "/leitura_qrcode");
                 },
                 child: Container(
                   height: 150,
