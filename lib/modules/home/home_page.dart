@@ -1,35 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:uai_pay/classes/estabelecimento.dart';
+import 'package:uai_pay/modules/home/leitor_qrcode.dart';
+import 'package:uai_pay/modules/home/pesquisa_menu.dart';
 import 'package:uai_pay/shared/themes/app_colors.dart';
 import 'package:uai_pay/shared/themes/app_text_styles.dart';
 import 'package:uai_pay/shared/widgets/item_listas_preco/item_listas_preco.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
-
-void pesquisa() async {
-  var url = Uri.http('jsonplaceholder.typicode.com', '/todos/1');
-
-  var response = await http.get(url);
-
-  var jsonResponse = convert.jsonDecode(response.body);
-
-  print(jsonResponse);
-}
-
-void pesquisa_local() async {
-  var url = Uri.http('192.168.0.104:21262', '');
-
-  var response = await http.get(url);
-
-  var jsonResponse = convert.jsonDecode(response.body);
-
-  print(jsonResponse);
-  print(jsonResponse[0]['1']['Nome']);
-
-  List<dynamic> user = convert.jsonDecode(response.body);
-
-  print('Howdy, ${user[0]}!');
-  //print('We sent the verification link to ${user['email']}.');
-}
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -39,6 +16,37 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late String _resultadoLeitura;
+  final leitorQR = LeitorQrCode();
+  final pesquisaMenu = PesquisaMenu();
+
+  buscaMenu(BuildContext context) async {
+    /*String response = await leitorQR.lerQRCode();
+    setState(() {
+      _resultadoLeitura = response;
+    });
+
+    String respostaMenu = await pesquisaMenu.pesquisaLocal(response); */
+
+    Estabelecimento? estabelecimento =
+        await pesquisaMenu.pesquisaLocal("qualquer coisa");
+
+    if (estabelecimento == null) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Error"),
+            content: Text("Tempo estourado"),
+          );
+        },
+      );
+    } else {
+      //print(respostaMenu);
+      print(estabelecimento.Menu[0].codigoCategoria);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final larguraTela = MediaQuery.of(context).size.width - 32;
@@ -62,9 +70,7 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               InkWell(
-                onTap: () {
-                  Navigator.pushNamed(context, "/leitura_qrcode");
-                },
+                onTap: () => {buscaMenu(context)},
                 child: Container(
                   height: 150,
                   width: 150,
@@ -90,8 +96,6 @@ class _HomePageState extends State<HomePage> {
               ),
               InkWell(
                 onTap: () {
-                  //pesquisa();
-                  //pesquisa_local();
                   Navigator.pushNamed(context, "/cardapio");
                 },
                 child: Container(
