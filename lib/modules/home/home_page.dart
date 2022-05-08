@@ -4,9 +4,6 @@ import 'package:uai_pay/modules/home/leitor_qrcode.dart';
 import 'package:uai_pay/modules/home/pesquisa_menu.dart';
 import 'package:uai_pay/shared/themes/app_colors.dart';
 import 'package:uai_pay/shared/themes/app_text_styles.dart';
-import 'package:uai_pay/shared/widgets/item_listas_preco/item_listas_preco.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert' as convert;
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -16,34 +13,73 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late String _resultadoLeitura;
+  Estabelecimento? estabelecimento;
   final leitorQR = LeitorQrCode();
   final pesquisaMenu = PesquisaMenu();
 
   buscaMenu(BuildContext context) async {
-    /*String response = await leitorQR.lerQRCode();
+    Estabelecimento? procuraEstabelecimento =
+        await pesquisaMenu.pesquisaLocal("qualquer coisa");
     setState(() {
-      _resultadoLeitura = response;
+      estabelecimento = procuraEstabelecimento;
     });
 
-    String respostaMenu = await pesquisaMenu.pesquisaLocal(response); */
+    confereLeituraQRCode("Leitura QrCode");
+  }
 
-    Estabelecimento? estabelecimento =
-        await pesquisaMenu.pesquisaLocal("qualquer coisa");
-
-    if (estabelecimento == null) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text("Error"),
-            content: Text("Tempo estourado"),
-          );
-        },
-      );
-    } else {
-      //print(respostaMenu);
-      print(estabelecimento.Menu[0].codigoCategoria);
+  confereLeituraQRCode(String localDaChamada) {
+    if (localDaChamada == "Leitura QrCode") {
+      if (estabelecimento == null) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Error"),
+              content: Text(
+                "Erro indevido na busca do cardápio.",
+              ),
+            );
+          },
+        );
+      } else if (estabelecimento!.CodigoEstabelecimento == 0000) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Error"),
+              content: Text(
+                "Tempo de busca acima da média. Tente ler o QR Code novamente.",
+              ),
+            );
+          },
+        );
+      } else {
+        Navigator.pushNamed(
+          context,
+          "/cardapio",
+          arguments: {'estabelecimentoAtual': estabelecimento},
+        );
+      }
+    } else if (localDaChamada == "Cardapio") {
+      if (estabelecimento == null ||
+          estabelecimento!.CodigoEstabelecimento == 0000) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Aviso!"),
+              content: Text("Leia o QRCode antes de acessar ao cardápio."),
+            );
+          },
+        );
+        return;
+      } else {
+        Navigator.pushNamed(
+          context,
+          "/cardapio",
+          arguments: {'estabelecimentoAtual': estabelecimento},
+        );
+      }
     }
   }
 
@@ -59,7 +95,8 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("AppBar da página Home"),
+        centerTitle: true,
+        title: Text("HOME"),
         backgroundColor: AppColors.primary,
       ),
       backgroundColor: AppColors.background,
@@ -96,7 +133,7 @@ class _HomePageState extends State<HomePage> {
               ),
               InkWell(
                 onTap: () {
-                  Navigator.pushNamed(context, "/cardapio");
+                  confereLeituraQRCode("Cardapio");
                 },
                 child: Container(
                   height: 150,

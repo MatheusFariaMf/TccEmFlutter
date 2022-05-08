@@ -1,21 +1,42 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'produto.g.dart';
+
+@JsonSerializable()
 class Produto {
-  final int _CodigoProduto;
-  final String _NomeItem;
-  final double _Preco;
-  final String _LinkImagem;
-  final String _Observacao;
-  final int _Quantidade;
-  final String _Unidade;
+  int codigoProduto;
+  String nomeItem;
+  double preco;
+  String linkImagem;
+  String observacao;
+  int quantidade;
+  String unidade;
 
   Produto(
-    this._CodigoProduto,
-    this._NomeItem,
-    this._Preco,
-    this._LinkImagem,
-    this._Observacao,
-    this._Quantidade,
-    this._Unidade,
+    this.codigoProduto,
+    this.nomeItem,
+    this.preco,
+    this.linkImagem,
+    this.observacao,
+    this.quantidade,
+    this.unidade,
   );
 
-  int get CodigoProduto => _CodigoProduto;
+  factory Produto.fromJson(Map<String, dynamic> json) =>
+      _$ProdutoFromJson(json);
+  toJson() => _$ProdutoToJson(this);
+
+  int get CodigoProduto => codigoProduto;
+
+  String get NomeItem => nomeItem;
+
+  double get Preco => preco;
+
+  String get LinkImagem => linkImagem;
+
+  String get Observacao => observacao;
+
+  int get Quantidade => quantidade;
+
+  String get Unidade => unidade;
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:uai_pay/classes/estabelecimento.dart';
 import 'package:uai_pay/modules/cadastro_usuario/cadastro_usuario_page.dart';
 import 'package:uai_pay/modules/cardapio/main_cardapio_page.dart';
 import 'package:uai_pay/modules/formas_pagamento/formas_pagamento.dart';
@@ -33,7 +34,12 @@ class AppWidget extends StatelessWidget {
           "/home": (context) => HomePage(),
           "/login": (context) => LoginPage(),
           "/cadastro_usuario": (context) => CadastroUsuarioPage(),
-          "/cardapio": (context) => MainCardapioPage(),
+          "/cardapio": (context) {
+            final args = ModalRoute.of(context)!.settings.arguments as Map;
+            return MainCardapioPage(
+              estabelecimentoAtual: args['estabelecimentoAtual'],
+            );
+          },
           "/formas_pagamento": (context) => FormasPagamento(),
           "/pedidos_abertos": (context) => PedidosAbertos(),
         });

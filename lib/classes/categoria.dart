@@ -1,15 +1,27 @@
 import 'package:uai_pay/classes/produto.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'categoria.g.dart';
+
+@JsonSerializable()
 class Categoria {
-  final int _CodigoCategoria;
-  final String _NomeCategoria;
-  final List<Produto> Itens;
+  int codigoCategoria;
+  String nomeCategoria;
+  List<Produto> itens;
 
   Categoria(
-    this._CodigoCategoria,
-    this._NomeCategoria,
-    this.Itens,
+    this.codigoCategoria,
+    this.nomeCategoria,
+    this.itens,
   );
 
-  int get codigoCategoria => _CodigoCategoria;
+  factory Categoria.fromJson(Map<String, dynamic> json) =>
+      _$CategoriaFromJson(json);
+  toJson() => _$CategoriaToJson(this);
+
+  int get CodigoCategoria => codigoCategoria;
+
+  String get NomeCategoria => nomeCategoria;
+
+  List<Produto> get Itens => itens;
 }
