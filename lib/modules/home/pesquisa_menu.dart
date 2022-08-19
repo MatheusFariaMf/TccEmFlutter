@@ -8,7 +8,9 @@ class PesquisaMenu {
     try {
       print("---- - - - -- CHEGOU AQUI. Essa é a resposta recebida: $ip_busca");
 
-      var url = Uri.http('192.168.0.103:21262', '');
+      //var url = Uri.http('192.168.0.103:21262', '');
+      //var url = Uri.http('ronepage.com.br', '/api/api_get_uaipay.php');
+      var url = Uri.http('ronepage.com.br', '/api/$ip_busca');
 
       var menu = await http.get(url).timeout(const Duration(seconds: 3));
 
@@ -20,7 +22,7 @@ class PesquisaMenu {
     } on TimeoutException catch (error) {
       print("Erro de timout: $error");
       Estabelecimento estabelecimentoVazio =
-          Estabelecimento(0000, "", "", "", "", 0, "", "", "", "", "", []);
+          Estabelecimento(0000, "", "", "", "", 0, "", "", "", "", "", [], "");
 
       return estabelecimentoVazio;
     } catch (e) {

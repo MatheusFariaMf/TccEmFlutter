@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:uai_pay/classes/estabelecimento.dart';
 import 'package:uai_pay/modules/cadastro_usuario/cadastro_usuario_page.dart';
 import 'package:uai_pay/modules/cardapio/main_cardapio_page.dart';
+import 'package:uai_pay/modules/comanda/comanda_page.dart';
 import 'package:uai_pay/modules/formas_pagamento/formas_pagamento.dart';
 import 'package:uai_pay/modules/login/login_page.dart';
 import 'package:uai_pay/modules/pedidos_abertos/pedidos_abertos.dart';
@@ -42,6 +43,7 @@ class AppWidget extends StatelessWidget {
           },
           "/formas_pagamento": (context) => FormasPagamento(),
           "/pedidos_abertos": (context) => PedidosAbertos(),
+          "/comanda": (context) => ComandaPage(),
         });
   }
 }

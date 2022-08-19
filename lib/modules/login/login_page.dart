@@ -86,7 +86,8 @@ class _LoginPageState extends State<LoginPage> {
                 child: const Text('Fazer login'),
                 style: style,
                 onPressed: () {
-                  Navigator.pushNamed(context, "/home");
+                  //Navigator.pushNamed(context, "/home");
+                  Navigator.pushReplacementNamed(context, "/home");
                   /*if (_email == "certo" && _password == "123") {
                     Navigator.pushNamed(context, "/home");
                     print("Email e senha corretos.");

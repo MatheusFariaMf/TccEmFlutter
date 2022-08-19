@@ -70,7 +70,6 @@ Future funcao(BuildContext context) {
           height: 350,
           width: 500,
           child: Stack(
-            overflow: Overflow.visible,
             children: <Widget>[
               /*Positioned(
                               right: -40.0,

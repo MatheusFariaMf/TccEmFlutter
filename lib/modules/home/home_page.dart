@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:uai_pay/classes/estabelecimento.dart';
+import 'package:uai_pay/modules/home/info_devs_page.dart';
 import 'package:uai_pay/modules/home/leitor_qrcode.dart';
 import 'package:uai_pay/modules/home/pesquisa_menu.dart';
+import 'package:uai_pay/shared/stores/estabelecimento_store.dart';
 import 'package:uai_pay/shared/themes/app_colors.dart';
 import 'package:uai_pay/shared/themes/app_text_styles.dart';
 
@@ -13,23 +16,32 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  Estabelecimento? estabelecimento;
   final leitorQR = LeitorQrCode();
   final pesquisaMenu = PesquisaMenu();
+  late EstabelecimentoStore estabelecimentoStore;
 
+  // Busca o cardápio do restaurante pela leitura do QRCode
   buscaMenu(BuildContext context) async {
-    Estabelecimento? procuraEstabelecimento =
-        await pesquisaMenu.pesquisaLocal("qualquer coisa");
-    setState(() {
-      estabelecimento = procuraEstabelecimento;
-    });
+    // RESPONSÁVEL PELA LEITURA DO QR CODE
+    String response = await leitorQR.lerQRCode();
 
-    confereLeituraQRCode("Leitura QrCode");
+    Estabelecimento? respostaMenu = await pesquisaMenu.pesquisaLocal(response);
+    if (respostaMenu != null) {
+      estabelecimentoStore.setEstabelecimento(respostaMenu);
+    }
+
+    if (estabelecimentoStore.estabelecimento != null && respostaMenu == null) {
+      confereLeituraQRCode("Leitura QrCode", true);
+    } else if (estabelecimentoStore.estabelecimento != null &&
+        respostaMenu != null) {
+      confereLeituraQRCode("Leitura QrCode", false);
+    }
   }
 
-  confereLeituraQRCode(String localDaChamada) {
+  // Função que confere se já um estabelecimento pesquisado pelo QRCode
+  confereLeituraQRCode(String localDaChamada, bool leitorCancelado) {
     if (localDaChamada == "Leitura QrCode") {
-      if (estabelecimento == null) {
+      if (estabelecimentoStore.estabelecimento == null) {
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -41,7 +53,8 @@ class _HomePageState extends State<HomePage> {
             );
           },
         );
-      } else if (estabelecimento!.CodigoEstabelecimento == 0000) {
+      } else if (estabelecimentoStore.estabelecimento!.CodigoEstabelecimento ==
+          0000) {
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -53,16 +66,18 @@ class _HomePageState extends State<HomePage> {
             );
           },
         );
-      } else {
+      } else if (!leitorCancelado) {
         Navigator.pushNamed(
           context,
           "/cardapio",
-          arguments: {'estabelecimentoAtual': estabelecimento},
+          arguments: {
+            'estabelecimentoAtual': estabelecimentoStore.estabelecimento
+          },
         );
       }
     } else if (localDaChamada == "Cardapio") {
-      if (estabelecimento == null ||
-          estabelecimento!.CodigoEstabelecimento == 0000) {
+      if (estabelecimentoStore.estabelecimento == null ||
+          estabelecimentoStore.estabelecimento!.CodigoEstabelecimento == 0000) {
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -77,15 +92,33 @@ class _HomePageState extends State<HomePage> {
         Navigator.pushNamed(
           context,
           "/cardapio",
-          arguments: {'estabelecimentoAtual': estabelecimento},
+          arguments: {
+            'estabelecimentoAtual': estabelecimentoStore.estabelecimento
+          },
         );
       }
     }
   }
 
+  mostraLogoRestaurante() {
+    if ((estabelecimentoStore.estabelecimento == null ||
+        estabelecimentoStore.estabelecimento!.CodigoEstabelecimento == 0000)) {
+      return const Text("");
+    } else {
+      return Image.network(
+        "https://ronepage.com.br/api/${estabelecimentoStore.estabelecimento!.logo}",
+        width: 150,
+        height: 150,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Obtem o store global da aplicacao para o estabelecimento
+    estabelecimentoStore = context.watch<EstabelecimentoStore>();
     final larguraTela = MediaQuery.of(context).size.width - 32;
+    InfoDevs infoDevs = InfoDevs();
 
     final ButtonStyle style = ElevatedButton.styleFrom(
       textStyle: const TextStyle(fontSize: 20),
@@ -95,14 +128,36 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true,
-        title: Text("HOME"),
-        backgroundColor: AppColors.primary,
-      ),
+          centerTitle: true,
+          title: Text("UaiPay"),
+          backgroundColor: AppColors.primary,
+          actions: [
+            IconButton(
+              color: AppColors.iconeInfo,
+              splashColor: Colors.white,
+              splashRadius: 20,
+              icon: Icon(
+                Icons.info,
+                size: 30,
+                //color: AppColors.iconeInfo,
+              ),
+              tooltip: 'Informação sobre os desenvolvedores',
+              onPressed: () {
+                setState(() {
+                  infoDevs.abreModalInfos(context);
+                });
+              },
+            ),
+          ]),
       backgroundColor: AppColors.background,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [mostraLogoRestaurante()],
+          ),
+          const SizedBox(height: 30),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -133,7 +188,7 @@ class _HomePageState extends State<HomePage> {
               ),
               InkWell(
                 onTap: () {
-                  confereLeituraQRCode("Cardapio");
+                  confereLeituraQRCode("Cardapio", false);
                 },
                 child: Container(
                   height: 150,
@@ -216,6 +271,17 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed(context, "/comanda");
+        },
+        backgroundColor: AppColors.primary,
+        tooltip: 'Comanda',
+        child: Icon(
+          Icons.list_alt_rounded,
+          color: AppColors.background,
+        ),
       ),
     );
   }

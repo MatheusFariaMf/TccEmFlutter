@@ -130,4 +130,9 @@ class TextStyles {
     fontWeight: FontWeight.w700,
     color: AppColors.primary,
   );
+  static final carrinhoVazio = GoogleFonts.lexendDeca(
+    fontSize: 30,
+    fontWeight: FontWeight.w600,
+    color: AppColors.body,
+  );
 }
